@@ -73,6 +73,65 @@ class BoardTest < Minitest::Test
     assert_equal Water, board.get(2,2).class
   end
 
+  def test_board_can_hold_ship_across_multiple_spaces
+    board = Board.new(3, 3)
+    b_ship = Ship.new("battleship", 2)
+
+    board.set(b_ship, 1, 1)
+    board.set(b_ship, 1, 2)
+
+    assert_equal b_ship, board.get(1, 1)
+    assert_equal b_ship, board.get(1, 2)
+
+    board.fire!(1, 1)
+    board.fire!(1, 2)
+
+    assert b_ship.sunk?, "The ship was not sunk"
+  end
+
+  def test_board_can_hold_ship_across_multiple_spaces_horizontally
+    board = Board.new(1, 4)
+    b_ship = Ship.new("battleship", 2)
+
+    board.place(b_ship, 1, 1)
+
+    assert_equal b_ship, board.get(1, 1)
+    assert_equal b_ship, board.get(1, 2)
+    refute_equal b_ship, board.get(1, 3)
+    refute_equal b_ship, board.get(1, 4)
+  end
+
+  def test_board_can_hold_ship_across_multiple_spaces_vertically
+    board = Board.new(4, 1)
+    b_ship = Ship.new("battleship", 2)
+
+    board.place(b_ship, 1, 1, true)
+
+    assert_equal b_ship, board.get(1, 1)
+    assert_equal b_ship, board.get(2, 1)
+    refute_equal b_ship, board.get(3, 1)
+    refute_equal b_ship, board.get(4, 1)
+  end
+
+  def test_square_board_can_hold_multiple_ships_across_multiple_spaces
+    board = Board.new(4, 4)
+    b_ship = Ship.new("battleship", 2)
+    a_ship = Ship.new("attlehip", 2)
+
+    board.place(b_ship, 1, 1, true)
+    board.place(a_ship, 4, 1, false)
+
+    assert_equal b_ship, board.get(1, 1)
+    assert_equal b_ship, board.get(2, 1)
+    refute_equal b_ship, board.get(3, 1)
+    refute_equal b_ship, board.get(4, 1)
+
+    assert_equal a_ship, board.get(4, 1)
+    assert_equal a_ship, board.get(4, 2)
+    refute_equal a_ship, board.get(4, 3)
+    refute_equal a_ship, board.get(4, 4)
+  end
+
   private
   def assert_nothing_raised(&block)
     yield

@@ -17,11 +17,26 @@ class Board
     @grid[x-1][y-1]
   end
 
+  def place(ship, x, y, vertical=false)
+    if vertical
+      for i in 0...ship.size
+        @grid[x + i - 1][y-1] = ship
+      end
+    else
+      for i in 0...ship.size
+        @grid[x-1][y + i - 1] = ship
+      end
+    end
+  end
+
   def fire!(x,y)
     get(x,y).hit!
   end
 
 end
+
+# 03/02
+# Board seems to be well tested - time to move to the next level up?
 
 # 2/17
 # Board should be able to hold one ship across multiple spaces
