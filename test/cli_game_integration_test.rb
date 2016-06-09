@@ -2,14 +2,25 @@ require 'minitest/autorun'
 require 'minitest/emoji'
 require './lib/cli'
 require 'pry'
+require 'mocha/mini_test'
 
 class CliGameIntegrationTest < Minitest::Test
+  def setup
+    @game = Minitest::Mock.new
+    @printer = Minitest::Mock.new
+    @input = Minitest::Mock.new
+    @cli = CLI.new(@input, @printer, @game)
+  end
+
+  def teardown
+    @game.verify
+    @printer.verify
+    @input.verify
+  end
+
+  
 
   def test_most_basic_game_executes
-    game = Minitest::Mock.new
-    printer = Minitest::Mock.new
-    input = Minitest::Mock.new
-    cli = CLI.new(input, printer, game)
     # takes in a StringIO thing
     # a STDOUT that it prints too,
     # and a STDIN that it takes info from (StringIO)
@@ -17,29 +28,30 @@ class CliGameIntegrationTest < Minitest::Test
     # as a mock with dependencies, it will make other mocks for us...?
     # `ruby battleship.rb`
     # BS file creates cli, game, input, and then starts the cli
-    game.expect(:start_game, nil)
-    # game.expect(:start_game2, nil)
-    cli.run
-    game.verify
-    # assert_equal "Welcome to battle ship. Would you like to start a new game?"
-    #
-    # `yes`
+    @printer.expect(:welcome_message, nil)
+    @input.expect(:get_input, "yes")
+    @game.expect(:start_game, nil)
 
-    # assert_equal "board size?"
-    #
-    # `2`
-    #
-    # assert_equal "ship count?"
-    #
-    # `1`
-    #
-    # assert_equal "The game has started"
-    #
-    # `1, 1`
-    #
-    # assert_equal "Hit! You sunk my battleship!"
+    @cli.run
   end
 
+  def test_user_can_quit_before_starting_game
+    @printer.expect(:welcome_message, nil)
+    @input.expect(:get_input, "quit")
+    @printer.expect(:goodbye_message, nil)
+
+    @cli.run
+  end
+
+  def test_user_can_read_instructions
+    @printer.expect(:welcome_message, nil)
+    1.times {@input.expect(:get_input, "instructions")}
+    @printer.expect(:instructions, nil)
+    1.times {@input.expect(:get_input, "quit")}
+    @printer.expect(:goodbye_message, nil)
+
+    @cli.run
+  end
 end
 
 # 3/14 -
