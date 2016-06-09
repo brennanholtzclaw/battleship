@@ -37,19 +37,19 @@ class CliGameIntegrationTest < Minitest::Test
   end
 
   def test_user_can_quit_before_starting_game
-    @printer.expect(:welcome_message, nil)
-    @input.expect(:get_input, "quit")
-    @printer.expect(:goodbye_message, nil)
+    @printer.expects(:welcome_message).returns(nil).once
+    @input.expects(:get_input).returns("quit").once
+    @printer.expects(:goodbye_message).once
 
     @cli.run
   end
 
   def test_user_can_read_instructions
-    @printer.expect(:welcome_message, nil)
-    1.times {@input.expect(:get_input, "instructions")}
-    @printer.expect(:instructions, nil)
-    1.times {@input.expect(:get_input, "quit")}
-    @printer.expect(:goodbye_message, nil)
+    @printer.expects(:welcome_message).returns(nil).once
+    @input.expects(:get_input).returns("instructions").once
+    @printer.expects(:instructions).returns(nil).once
+    @input.expects(:get_input).returns("quit").once
+    @printer.expects(:goodbye_message).returns(nil).once
 
     @cli.run
   end
