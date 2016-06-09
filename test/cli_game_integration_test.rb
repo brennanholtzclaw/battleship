@@ -1,24 +1,25 @@
 require 'minitest/autorun'
 require 'minitest/emoji'
 require './lib/cli'
+require './lib/printer'
+require './lib/input'
+require './lib/game'
 require 'pry'
 require 'mocha/mini_test'
 
 class CliGameIntegrationTest < Minitest::Test
   def setup
-    @game = Minitest::Mock.new
-    @printer = Minitest::Mock.new
-    @input = Minitest::Mock.new
+    @game = Game.new
+    @printer = Printer.new
+    @input = Input.new
     @cli = CLI.new(@input, @printer, @game)
   end
 
   def teardown
-    @game.verify
-    @printer.verify
-    @input.verify
+    # @game.verify
+    # @printer.verify
+    # @input.verify
   end
-
-  
 
   def test_most_basic_game_executes
     # takes in a StringIO thing
@@ -28,9 +29,9 @@ class CliGameIntegrationTest < Minitest::Test
     # as a mock with dependencies, it will make other mocks for us...?
     # `ruby battleship.rb`
     # BS file creates cli, game, input, and then starts the cli
-    @printer.expect(:welcome_message, nil)
-    @input.expect(:get_input, "yes")
-    @game.expect(:start_game, nil)
+    @printer.expects(:welcome_message).returns(nil).once
+    @input.expects(:get_input).returns("yes").once
+    @game.expects(:start_game).returns(nil).once
 
     @cli.run
   end
